@@ -50,6 +50,20 @@ final class ConnectTests: XCTestCase {
     }
     
     
+    func test_fetchApps_failure_setsErrorMessage() async {
+        let mockService = MockAppStoreService()
+        mockService.fetchPendingAppsResult = .failure(MockError.sample)
+
+        let sut = makeSUT(service: mockService)
+
+        await sut.fetchApps()
+
+        XCTAssertTrue(sut.apps.isEmpty)
+        XCTAssertNotNil(sut.errorMessage)
+        XCTAssertFalse(sut.isLoading)
+    }
+    
+    
     func makeSUT(service: MockAppStoreService) -> AppListViewModel {
         let sut = AppListViewModel(appStoreService: service)
 
