@@ -7,7 +7,14 @@
 
 import Foundation
 
-class AppStoreService {
+
+protocol AppStoreServiceProtocol {
+    func fetchPendingApps() async throws -> [AppInfo]
+    func resolveCompliance(buildId: String, usesEncryption: Bool) async throws
+    func releaseApp(versionId: String) async throws
+}
+
+class AppStoreService: AppStoreServiceProtocol {
     static let shared = AppStoreService()
     private let baseURL = "https://api.appstoreconnect.apple.com/v1"
 

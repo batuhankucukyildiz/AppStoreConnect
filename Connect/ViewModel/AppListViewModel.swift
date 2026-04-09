@@ -14,12 +14,17 @@ class AppListViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var releasingIds: Set<String> = []
-
+    private let appStoreService: AppStoreServiceProtocol
+    
+    init(appStoreService: AppStoreServiceProtocol = AppStoreService.shared) {
+        self.appStoreService = appStoreService
+    }
+    
     func fetchApps() async {
         isLoading = true
         errorMessage = nil
         do {
-            apps = try await AppStoreService.shared.fetchPendingApps()
+            apps = try await appStoreService.fetchPendingApps()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -29,7 +34,7 @@ class AppListViewModel: ObservableObject {
     func release(app: AppInfo) async {
         releasingIds.insert(app.id)
         do {
-            try await AppStoreService.shared.releaseApp(versionId: app.versionId)
+            try await appStoreService.releaseApp(versionId: app.versionId)
             apps.removeAll { $0.id == app.id }
         } catch {
             errorMessage = "Release hatası: \(error.localizedDescription)"
@@ -40,7 +45,7 @@ class AppListViewModel: ObservableObject {
     func resolve(app: AppInfo, usesEncryption: Bool) async {
         releasingIds.insert(app.id)
         do {
-            try await AppStoreService.shared.resolveCompliance(buildId: app.versionId, usesEncryption: usesEncryption)
+            try await appStoreService.resolveCompliance(buildId: app.versionId, usesEncryption: usesEncryption)
             apps.removeAll { $0.id == app.id }
         } catch {
             errorMessage = "Hata: \(error.localizedDescription)"
