@@ -22,7 +22,6 @@ final class ConnectTests: XCTestCase {
             bundleId: "com.test.one",
             version: "1.0",
             state: .inReview
-           
         )
 
         let app2 = AppInfo(
@@ -49,7 +48,6 @@ final class ConnectTests: XCTestCase {
         XCTAssertFalse(sut.isLoading)
     }
     
-    
     func test_fetchApps_failure_setsErrorMessage() async {
         let mockService = MockAppStoreService()
         mockService.fetchPendingAppsResult = .failure(MockError.sample)
@@ -63,6 +61,38 @@ final class ConnectTests: XCTestCase {
         XCTAssertFalse(sut.isLoading)
     }
     
+    func test_release_success_removesApp() async {
+        let mockService = MockAppStoreService()
+        let sut = makeSUT(service: mockService)
+        
+        let app1 = AppInfo(
+            id: "1",
+            versionId: "v1",
+            name: "App One",
+            bundleId: "com.test.one",
+            version: "1.0",
+            state: .inReview
+        )
+
+        let app2 = AppInfo(
+            id: "2",
+            versionId: "v2",
+            name: "App Two",
+            bundleId: "com.test.two",
+            version: "1.1",
+            state: .missingCompliance
+        )
+        
+        sut.apps = [app1, app2]
+        
+        await sut.release(app: app1)
+        
+        
+        XCTAssertEqual(mockService.releaseCalledVersionId, "v1")
+        XCTAssertEqual(sut.apps.map(\.id), ["2"])
+        XCTAssertFalse(sut.releasingIds.contains("1"))
+        XCTAssertNil(sut.errorMessage)
+    }
     
     func makeSUT(service: MockAppStoreService) -> AppListViewModel {
         let sut = AppListViewModel(appStoreService: service)
