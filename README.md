@@ -36,7 +36,7 @@ Clone the repository:
 
 Bash
 
-git clone [https://github.com/yourusername/Connect.git](https://github.com/batuhankucukyildiz/AppStoreConnect)
+git clone (https://github.com/batuhankucukyildiz/AppStoreConnect)
 Open Connect.xcodeproj in Xcode.
 
 Build and Run the project (Cmd + R).
