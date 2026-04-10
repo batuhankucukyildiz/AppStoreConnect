@@ -10,7 +10,7 @@ import XCTest
 
 
 @MainActor
-final class ConnectTests: XCTestCase {
+final class AppListViewModelTest: XCTestCase {
 
     func test_fetchApps_success_updateapps() async {
         let mockService = MockAppStoreService()
