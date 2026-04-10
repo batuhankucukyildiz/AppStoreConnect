@@ -142,6 +142,33 @@ final class ConnectTests: XCTestCase {
         XCTAssertFalse(sut.releasingIds.contains("1"))
     }
     
+    func test_resolve_failure_keepsAppAndSetsErrorMessage() async {
+        let mockService = MockAppStoreService()
+        mockService.resolveComplianceResult = .failure(MockError.sample)
+        
+        let sut = makeSUT(service: mockService)
+        
+        let app = AppInfo(
+            id: "1",
+            versionId: "build-123",
+            name: "Test App",
+            bundleId: "com.test.app",
+            version: "1.0",
+            state: .missingCompliance
+        )
+        
+        sut.apps = [app]
+        
+        await sut.resolve(app: app, usesEncryption: true)
+        
+        XCTAssertEqual(mockService.resolveCalledBuildId, "build-123")
+        XCTAssertEqual(mockService.resolveCalledUsesEncryption, true)
+        XCTAssertEqual(sut.apps.count, 1)
+        XCTAssertEqual(sut.apps.first?.id, "1")
+        XCTAssertNotNil(sut.errorMessage)
+        XCTAssertFalse(sut.releasingIds.contains("1"))
+    }
+    
     func makeSUT(service: MockAppStoreService) -> AppListViewModel {
         let sut = AppListViewModel(appStoreService: service)
 
