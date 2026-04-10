@@ -119,6 +119,29 @@ final class ConnectTests: XCTestCase {
         XCTAssertFalse(sut.releasingIds.contains("1"))
     }
     
+    func test_resolve_success_removesApp() async {
+        let mockService = MockAppStoreService()
+        let sut = makeSUT(service: mockService)
+        
+        let app = AppInfo(
+            id: "1",
+            versionId: "v1",
+            name: "App One",
+            bundleId: "com.test.one",
+            version: "1.0",
+            state: .inReview
+        )
+        
+        sut.apps = [app]
+        
+        await sut.resolve(app: app, usesEncryption: true)
+        
+        XCTAssertEqual(mockService.resolveCalledBuildId, "v1")
+        XCTAssertEqual(mockService.resolveCalledUsesEncryption, true)
+        XCTAssertTrue(sut.apps.isEmpty)
+        XCTAssertFalse(sut.releasingIds.contains("1"))
+    }
+    
     func makeSUT(service: MockAppStoreService) -> AppListViewModel {
         let sut = AppListViewModel(appStoreService: service)
 
