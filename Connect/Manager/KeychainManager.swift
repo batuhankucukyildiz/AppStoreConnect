@@ -9,8 +9,13 @@
 import Foundation
 import Security
 
-struct KeychainManager {
-    static func save(_ value: String, for key: String) {
+protocol KeychainServiceProtocol {
+    func load(for key: String) -> String?
+    func save(_ value: String, for key: String)
+}
+
+struct KeychainManager: KeychainServiceProtocol {
+    func save(_ value: String, for key: String) {
         let data = Data(value.utf8)
         let query: [String: Any] = [
             kSecClass as String:       kSecClassGenericPassword,
@@ -21,7 +26,7 @@ struct KeychainManager {
         SecItemAdd(query as CFDictionary, nil)
     }
 
-    static func load(for key: String) -> String? {
+    func load(for key: String) -> String? {
         let query: [String: Any] = [
             kSecClass as String:       kSecClassGenericPassword,
             kSecAttrAccount as String: key,

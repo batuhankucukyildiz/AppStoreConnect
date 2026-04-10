@@ -14,9 +14,9 @@ protocol TokenProvider {
 final class AppStoreTokenProvider: TokenProvider {
     func fetchToken() throws -> String {
         guard
-            let issuerId = KeychainManager.load(for: "issuerId"),
-            let keyId = KeychainManager.load(for: "keyId"),
-            let privateKey = KeychainManager.load(for: "privateKey"),
+            let issuerId = DependencyContainer.shared.keychainService.load(for: "issuerId"),
+            let keyId = DependencyContainer.shared.keychainService.load(for: "keyId"),
+            let privateKey = DependencyContainer.shared.keychainService.load(for: "privateKey"),
             let token = try? JWTGenerator.generate(
                 issuerId: issuerId,
                 keyId: keyId,
