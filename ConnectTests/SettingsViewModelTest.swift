@@ -27,7 +27,20 @@ final class SettingsViewModelTest: XCTestCase {
         XCTAssertEqual(sut.privateKey, "test-private-key")
     }
     
-    
+    func test_save_persistsDataInKeychain() {
+        let mockKeychainService = MockKeychainService()
+        let sut = makeSUT(keychainService: mockKeychainService)
+        
+        sut.issuerId = "test-issuer"
+        sut.keyId = "test-key-id"
+        sut.privateKey = "test-private-key"
+        sut.save()
+        
+        XCTAssertTrue(mockKeychainService.saveCalled)
+        XCTAssertEqual(mockKeychainService.storage["issuerId"], "test-issuer")
+        XCTAssertEqual(mockKeychainService.storage["keyId"], "test-key-id")
+        XCTAssertEqual(sut.saved, true)
+    }
     
     func makeSUT(keychainService: KeychainServiceProtocol) -> SettingsViewModel {
         let sut = SettingsViewModel(keychainService: keychainService)
