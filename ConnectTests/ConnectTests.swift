@@ -94,6 +94,31 @@ final class ConnectTests: XCTestCase {
         XCTAssertNil(sut.errorMessage)
     }
     
+    func test_release_failure_keepsAppAndSetsError() async {
+        let mockService = MockAppStoreService()
+        
+        mockService.releaseAppResult = .failure(MockError.sample)
+        
+        let sut = makeSUT(service: mockService)
+        
+        let app = AppInfo(
+            id: "1",
+            versionId: "v1",
+            name: "App One",
+            bundleId: "com.test.one",
+            version: "1.0",
+            state: .inReview
+        )
+        
+        sut.apps.append(app)
+        
+        await sut.release(app: app)
+        
+        XCTAssertEqual(sut.apps.map(\.id), ["1"])
+        XCTAssertNotNil(sut.errorMessage)
+        XCTAssertFalse(sut.releasingIds.contains("1"))
+    }
+    
     func makeSUT(service: MockAppStoreService) -> AppListViewModel {
         let sut = AppListViewModel(appStoreService: service)
 
